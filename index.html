@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      .title {
+        padding: 6px;
+        font-weight: bold;
+        margin-right: 12px;
+      }
+      .content {
+        display: flex;
+      }
+      .value {
+        padding: 6px;
+      }
+    </style>
+  </head>
+  <body style="height: 100%; margin: 0; overflow: hidden">
+    <div id="container" style="height: 100%"></div>
+    <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="./data.js"></script>
+    <script type="text/javascript">
+      const dom = document.getElementById('container')
+      const myChart = echarts.init(dom, null, {
+        renderer: 'canvas',
+        useDirtyRect: false,
+      })
+      const app = {}
+      const ROOT_PATH = './'
+      let option
+
+      myChart.showLoading()
+
+      const dataTreeEN = []
+      const dataTreeCN = []
+      const colorInfo = {
+        Alliaceous: '#6a4b8f',
+        Animalic: '#015392',
+        Buttery: '#4099be',
+        Cocoa: '#036644',
+        Earthy: '#70a954',
+        Floral: '#f7a718',
+        Fruity: '#de7510',
+        Green: '#c75735',
+        'Meat/Savoury': '#ac2e6e',
+        Musty: '#753f77',
+        Nutty: '#a85095',
+        Roasted: '#5c595c',
+        Smoke: '#44778f',
+        Sour: '#a76b53',
+        Spicy: '#3773bc',
+        Sweet: '#34783e',
+        Vanilla: '#b16081',
+        Vegetative: '#095fa1',
+      }
+
+      data.forEach((e) => {
+        const group = e['组别-ENG']
+        const i = dataTreeEN.findIndex((a) => a.name === group)
+        if (i > -1) {
+          dataTreeEN[i].children.push({
+            name: e['化学名'],
+            value: e,
+            lineStyle: {
+              color: colorInfo[group],
+            },
+            itemStyle: {
+              color: colorInfo[group],
+            },
+            label: {
+              color: colorInfo[group],
+            },
+          })
+          dataTreeCN[i].children.push({
+            name: e['中文翻译'],
+            value: e,
+            lineStyle: {
+              color: colorInfo[group],
+            },
+            itemStyle: {
+              color: colorInfo[group],
+            },
+            label: {
+              color: colorInfo[group],
+            },
+          })
+        } else {
+          dataTreeEN.push({
+            name: e['组别-ENG'],
+            lineStyle: {
+              color: colorInfo[group] + '33',
+            },
+            itemStyle: {
+              color: colorInfo[group],
+            },
+            label: {
+              color: colorInfo[group],
+            },
+            children: [
+              {
+                name: e['化学名'],
+                value: e,
+                lineStyle: {
+                  color: colorInfo[group],
+                },
+                itemStyle: {
+                  color: colorInfo[group],
+                },
+                label: {
+                  color: colorInfo[group],
+                },
+              },
+            ],
+          })
+          dataTreeCN.push({
+            name: e['组别-CN'],
+            lineStyle: {
+              color: colorInfo[group] + '33',
+            },
+            itemStyle: {
+              color: colorInfo[group],
+            },
+            label: {
+              color: colorInfo[group],
+            },
+            children: [
+              {
+                name: e['中文翻译'],
+                value: e,
+                lineStyle: {
+                  color: colorInfo[group],
+                },
+                itemStyle: {
+                  color: colorInfo[group],
+                },
+                label: {
+                  color: colorInfo[group],
+                },
+              },
+            ],
+          })
+        }
+      })
+      console.log(dataTreeEN)
+      console.log(dataTreeCN)
+
+      function valueFormatter(v, lang = 'dataTreeEN') {
+        let arr = []
+        if (lang === 'dataTreeCN') {
+          arr = [
+            { key: '组别', value: '组别-CN' },
+            { key: '化学名', value: '中文翻译' },
+            { key: '气味', value: '备注1' },
+            { key: '风味', value: '备注2' },
+          ]
+        } else {
+          arr = [
+            { key: 'Group', value: '组别-ENG' },
+            { key: 'Chemical Name', value: '化学名' },
+            { key: 'Odor', value: 'odor(气味)' },
+            { key: 'flavor', value: 'flavor（风味）' },
+          ]
+        }
+        const s = arr
+          .map((e) => {
+            return v.value[e.value] ? `<div class="content"><span class='title'>${e.key}:</span><span class='value'>${v.value[e.value]}</span></div>` : ''
+          })
+          .join('\n')
+        console.log(s)
+        return s
+      }
+
+      myChart.hideLoading()
+      myChart.setOption(
+        (option = {
+          tooltip: {
+            trigger: 'item',
+            triggerOn: 'click',
+            formatter: (v) => {
+              console.log(v)
+              return `
+          <div style="font-size:16px;">
+            ${valueFormatter(v, 'dataTreeCN')}
+          </div>
+          `
+            },
+          },
+          series: [
+            {
+              type: 'tree',
+
+              data: [{ children: dataTreeCN }],
+
+              top: '20%',
+              bottom: '25%',
+
+              layout: 'radial',
+
+              symbol: 'emptyCircle',
+
+              symbolSize: 8,
+
+              initialTreeDepth: 3,
+
+              animationDurationUpdate: 750,
+
+              emphasis: {
+                focus: 'descendant',
+              },
+            },
+          ],
+        })
+      )
+
+      if (option && typeof option === 'object') {
+        myChart.setOption(option)
+      }
+
+      window.addEventListener('resize', myChart.resize)
+    </script>
+  </body>
+</html>
