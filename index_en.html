@@ -18,7 +18,7 @@
   </head>
   <body style="height: 100%; margin: 0; overflow: hidden">
     <div id="container" style="height: 100%"></div>
-    <a href="./index_en.html" style="position:fixed;right:12px;top:12px;">English</a>
+    <a href="./index.html" style="position:fixed;right:12px;top:12px;">中文</a>
     <script type="text/javascript" src="./echarts.min.js"></script>
     <script type="text/javascript" src="./data.js"></script>
     <script type="text/javascript">
@@ -182,7 +182,7 @@
               console.log(v)
               return `
           <div style="font-size:16px;">
-            ${valueFormatter(v, 'dataTreeCN')}
+            ${valueFormatter(v, 'dataTreeEN')}
           </div>
           `
             },
@@ -191,7 +191,7 @@
             {
               type: 'tree',
 
-              data: [{ children: dataTreeCN }],
+              data: [{ children: dataTreeEN }],
 
               top: '20%',
               bottom: '25%',
